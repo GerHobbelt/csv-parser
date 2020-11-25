@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.9)
 project(csv)
 
-if(CSV_CXX_STANDARD)
-	set(CMAKE_CXX_STANDARD ${CSV_CXX_STANDARD})
-else()
-	set(CMAKE_CXX_STANDARD 17)
-endif(CSV_CXX_STANDARD)
+set(CMAKE_CXX_STANDARD 11)
+
+#if(CSV_CXX_STANDARD)
+#	set(CMAKE_CXX_STANDARD ${CSV_CXX_STANDARD})
+#else()
+#	set(CMAKE_CXX_STANDARD 17)
+#endif(CSV_CXX_STANDARD)
 
 message("Building CSV library using C++${CMAKE_CXX_STANDARD}")
 
@@ -50,33 +52,33 @@ add_subdirectory(${CSV_SOURCE_DIR})
 add_subdirectory("programs")
 
 ## Developer settings
-if (CSV_DEVELOPER)
-    # Generate a single header library
-    find_package(Python3 QUIET)
-    if(Python3_Interpreter_FOUND)
-      add_custom_target(generate_single_header
-          COMMAND ${Python3_EXECUTABLE} single_header.py > single_include/csv.hpp
-          COMMAND ${Python3_EXECUTABLE} single_header.py > single_include_test/csv.hpp
-          WORKING_DIRECTORY ${CSV_ROOT_DIR}
-      )
-      # Single header compilation test
-      add_subdirectory(single_include_test)
-    else()
-      message(WARNING "Python3 not found, skipping target 'generate_single_header'.")
-    endif()
-
-    # Documentation
-    find_package(Doxygen QUIET)
-    if(DOXYGEN_FOUND)
-      add_custom_target(doxygen
-          COMMAND ${DOXYGEN_EXECUTABLE} ${CSV_ROOT_DIR}/Doxyfile
-          WORKING_DIRECTORY ${CSV_ROOT_DIR}
-      )
-    else()
-      message(WARNING "Doxygen not found, skipping target 'doxygen'.")
-    endif()
-
-    ## Tests
-    enable_testing()
-    add_subdirectory("tests")
-endif()
+#if (CSV_DEVELOPER)
+#    # Generate a single header library
+#    find_package(Python3 QUIET)
+#    if(Python3_Interpreter_FOUND)
+#      add_custom_target(generate_single_header
+#          COMMAND ${Python3_EXECUTABLE} single_header.py > single_include/csv.hpp
+#          COMMAND ${Python3_EXECUTABLE} single_header.py > single_include_test/csv.hpp
+#          WORKING_DIRECTORY ${CSV_ROOT_DIR}
+#      )
+#      # Single header compilation test
+#      add_subdirectory(single_include_test)
+#    else()
+#      message(WARNING "Python3 not found, skipping target 'generate_single_header'.")
+#    endif()
+#
+#    # Documentation
+#    find_package(Doxygen QUIET)
+#    if(DOXYGEN_FOUND)
+#      add_custom_target(doxygen
+#          COMMAND ${DOXYGEN_EXECUTABLE} ${CSV_ROOT_DIR}/Doxyfile
+#          WORKING_DIRECTORY ${CSV_ROOT_DIR}
+#      )
+#    else()
+#      message(WARNING "Doxygen not found, skipping target 'doxygen'.")
+#    endif()
+#
+#    ## Tests
+#    enable_testing()
+#    add_subdirectory("tests")
+#endif()

@@ -1,0 +1,1 @@
+/usr/bin/c++   -Wno-unknown-pragmas -g -Og   CMakeFiles/csv_bench.dir/csv_bench.cpp.o  -o csv_bench ../include/internal/libcsv.a -pthread 

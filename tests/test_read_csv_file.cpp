@@ -25,9 +25,9 @@ TEST_CASE("Prevent Column Names From Being Overwritten", "[csv_col_names_overwri
     std::vector<CSVFormat> formats = {};
     formats.push_back(CSVFormat::guess_csv());
     formats.push_back(CSVFormat());
-    formats.back().delimiter(std::vector<char>({ ',', '\t', '|'}));
+    formats.back().delimiter(std::vector<unsigned int>({ ',', '\t', '|'}));
     formats.push_back(CSVFormat());
-    formats.back().delimiter(std::vector<char>({ ',', '~'}));
+    formats.back().delimiter(std::vector<unsigned int>({ ',', '~'}));
 
     for (auto& format_in : formats) {
         // Set up the CSVReader

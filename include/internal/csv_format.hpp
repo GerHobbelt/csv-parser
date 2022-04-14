@@ -26,7 +26,7 @@ namespace csv {
 
     /** Stores the inferred format of a CSV file. */
     struct CSVGuessResult {
-        char delim;
+        unsigned delim;
         int header_row;
     };
 
@@ -42,27 +42,27 @@ namespace csv {
          *
          *  @throws `std::runtime_error` thrown if trim, quote, or possible delimiting characters overlap
          */
-        CSVFormat& delimiter(char delim);
+        CSVFormat& delimiter(unsigned int delim);
 
         /** Sets a list of potential delimiters
          *  
          *  @throws `std::runtime_error` thrown if trim, quote, or possible delimiting characters overlap
          *  @param[in] delim An array of possible delimiters to try parsing the CSV with
          */
-        CSVFormat& delimiter(const std::vector<char> & delim);
+        CSVFormat& delimiter(const std::vector<unsigned int> & delim);
 
         /** Sets the whitespace characters to be trimmed
          *
          *  @throws `std::runtime_error` thrown if trim, quote, or possible delimiting characters overlap
          *  @param[in] ws An array of whitespace characters that should be trimmed
          */
-        CSVFormat& trim(const std::vector<char> & ws);
+        CSVFormat& trim(const std::vector<unsigned int> & ws);
 
         /** Sets the quote character
          *
          *  @throws `std::runtime_error` thrown if trim, quote, or possible delimiting characters overlap
          */
-        CSVFormat& quote(char quote);
+        CSVFormat& quote(unsigned int quote);
 
         /** Sets the column names.
          *
@@ -86,12 +86,6 @@ namespace csv {
             return *this;
         }
 
-        /** Turn quoting on or off */
-        CSVFormat& quote(bool use_quote) {
-            this->no_quote = !use_quote;
-            return *this;
-        }
-
         /** Tells the parser how to handle columns of a different length than the others */
         CONSTEXPR_14 CSVFormat& variable_columns(VariableColumnPolicy policy = VariableColumnPolicy::IGNORE_ROW) {
             this->variable_column_policy = policy;
@@ -105,7 +99,7 @@ namespace csv {
         }
 
         #ifndef DOXYGEN_SHOULD_SKIP_THIS
-        char get_delim() const {
+        unsigned int get_delim() const {
             // This error should never be received by end users.
             if (this->possible_delimiters.size() > 1) {
                 throw std::runtime_error("There is more than one possible delimiter.");
@@ -117,8 +111,8 @@ namespace csv {
         CONSTEXPR bool is_quoting_enabled() const { return !this->no_quote; }
         CONSTEXPR char get_quote_char() const { return this->quote_char; }
         CONSTEXPR int get_header() const { return this->header; }
-        std::vector<char> get_possible_delims() const { return this->possible_delimiters; }
-        std::vector<char> get_trim_chars() const { return this->trim_chars; }
+        std::vector<unsigned int> get_possible_delims() const { return this->possible_delimiters; }
+        std::vector<unsigned int> get_trim_chars() const { return this->trim_chars; }
         CONSTEXPR VariableColumnPolicy get_variable_column_policy() const { return this->variable_column_policy; }
         #endif
         
@@ -144,10 +138,10 @@ namespace csv {
         void assert_no_char_overlap();
 
         /**< Set of possible delimiters */
-        std::vector<char> possible_delimiters = { ',' };
+        std::vector<unsigned int> possible_delimiters = { ','};
 
         /**< Set of whitespace characters to trim */
-        std::vector<char> trim_chars = {};
+        std::vector<unsigned int> trim_chars = {};
 
         /**< Row number with columns (ignored if col_names is non-empty) */
         int header = 0;

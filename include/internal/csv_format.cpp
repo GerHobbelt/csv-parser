@@ -8,26 +8,25 @@
 #include "csv_format.hpp"
 
 namespace csv {
-    CSV_INLINE CSVFormat& CSVFormat::delimiter(char delim) {
+    CSV_INLINE CSVFormat& CSVFormat::delimiter(unsigned int delim) {
         this->possible_delimiters = { delim };
         this->assert_no_char_overlap();
         return *this;
     }
 
-    CSV_INLINE CSVFormat& CSVFormat::delimiter(const std::vector<char> & delim) {
+    CSV_INLINE CSVFormat& CSVFormat::delimiter(const std::vector<unsigned int> & delim) {
         this->possible_delimiters = delim;
         this->assert_no_char_overlap();
         return *this;
     }
 
-    CSV_INLINE CSVFormat& CSVFormat::quote(char quote) {
+    CSV_INLINE CSVFormat& CSVFormat::quote(unsigned int quote) {
         this->no_quote = false;
         this->quote_char = quote;
-        this->assert_no_char_overlap();
         return *this;
     }
 
-    CSV_INLINE CSVFormat& CSVFormat::trim(const std::vector<char> & chars) {
+    CSV_INLINE CSVFormat& CSVFormat::trim(const std::vector<unsigned int> & chars) {
         this->trim_chars = chars;
         this->assert_no_char_overlap();
         return *this;
@@ -49,13 +48,12 @@ namespace csv {
 
     CSV_INLINE void CSVFormat::assert_no_char_overlap()
     {
-        auto delims = std::set<char>(
-            this->possible_delimiters.begin(), this->possible_delimiters.end()),
-            trims = std::set<char>(
-                this->trim_chars.begin(), this->trim_chars.end());
+        auto delims = std::set<unsigned int>(
+            this->possible_delimiters.begin(), this->possible_delimiters.end());
+        auto trims = std::set<unsigned int>(this->trim_chars.begin(), this->trim_chars.end());
 
         // Stores intersection of possible delimiters and trim characters
-        std::vector<char> intersection = {};
+        std::vector<unsigned int> intersection = {};
 
         // Find which characters overlap, if any
         std::set_intersection(

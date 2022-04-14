@@ -4907,7 +4907,7 @@ namespace csv {
 
     /** Stores the inferred format of a CSV file. */
     struct CSVGuessResult {
-        char delim;
+        unsigned int delim;
         int header_row;
     };
 
@@ -4930,7 +4930,7 @@ namespace csv {
          *  @throws `std::runtime_error` thrown if trim, quote, or possible delimiting characters overlap
          *  @param[in] delim An array of possible delimiters to try parsing the CSV with
          */
-        CSVFormat& delimiter(const std::vector<char> & delim);
+        CSVFormat& delimiter(const std::vector<unsigned int> & delim);
 
         /** Sets the whitespace characters to be trimmed
          *
@@ -4998,7 +4998,7 @@ namespace csv {
         CONSTEXPR bool is_quoting_enabled() const { return !this->no_quote; }
         CONSTEXPR char get_quote_char() const { return this->quote_char; }
         CONSTEXPR int get_header() const { return this->header; }
-        std::vector<char> get_possible_delims() const { return this->possible_delimiters; }
+        std::vector<unsigned int> get_possible_delims() const { return this->possible_delimiters; }
         std::vector<char> get_trim_chars() const { return this->trim_chars; }
         CONSTEXPR VariableColumnPolicy get_variable_column_policy() const { return this->variable_column_policy; }
         #endif
@@ -5025,7 +5025,7 @@ namespace csv {
         void assert_no_char_overlap();
 
         /**< Set of possible delimiters */
-        std::vector<char> possible_delimiters = { ',' };
+        std::vector<unsigned int> possible_delimiters = { ',' };
 
         /**< Set of whitespace characters to trim */
         std::vector<char> trim_chars = {};
@@ -6231,7 +6231,7 @@ namespace csv {
 
         CSV_INLINE GuessScore calculate_score(csv::string_view head, CSVFormat format);
 
-        CSVGuessResult _guess_format(csv::string_view head, const std::vector<char>& delims = { ',', '|', '\t', ';', '^', '~' });
+        CSVGuessResult _guess_format(csv::string_view head, const std::vector<unsigned int>& delims = { ',', '|', '\t', ';', '^', '~' });
     }
 
     std::vector<std::string> get_col_names(
@@ -6240,7 +6240,7 @@ namespace csv {
 
     /** Guess the delimiter used by a delimiter-separated values file */
     CSVGuessResult guess_format(csv::string_view filename,
-        const std::vector<char>& delims = { ',', '|', '\t', ';', '^', '~' });
+        const std::vector<unsigned int>& delims = { ',', '|', '\t', ';', '^', '~' });
 
     /** @class CSVReader
      *  @brief Main class for parsing CSVs from files and in-memory sources
@@ -7164,13 +7164,13 @@ namespace csv {
 
 
 namespace csv {
-    CSV_INLINE CSVFormat& CSVFormat::delimiter(char delim) {
+    CSV_INLINE CSVFormat& CSVFormat::delimiter(unsigned int delim) {
         this->possible_delimiters = { delim };
         this->assert_no_char_overlap();
         return *this;
     }
 
-    CSV_INLINE CSVFormat& CSVFormat::delimiter(const std::vector<char> & delim) {
+    CSV_INLINE CSVFormat& CSVFormat::delimiter(const std::vector<unsigned int> & delim) {
         this->possible_delimiters = delim;
         this->assert_no_char_overlap();
         return *this;
@@ -7205,9 +7205,9 @@ namespace csv {
 
     CSV_INLINE void CSVFormat::assert_no_char_overlap()
     {
-        auto delims = std::set<char>(
-            this->possible_delimiters.begin(), this->possible_delimiters.end()),
-            trims = std::set<char>(
+        auto delims = std::set<unsigned int>(
+            this->possible_delimiters.begin(), this->possible_delimiters.end());
+        trims = std::set<char>(
                 this->trim_chars.begin(), this->trim_chars.end());
 
         // Stores intersection of possible delimiters and trim characters
@@ -7337,7 +7337,7 @@ namespace csv {
         }
 
         /** Guess the delimiter used by a delimiter-separated values file */
-        CSV_INLINE CSVGuessResult _guess_format(csv::string_view head, const std::vector<char>& delims) {
+        CSV_INLINE CSVGuessResult _guess_format(csv::string_view head, const std::vector<unsigned int>& delims) {
             /** For each delimiter, find out which row length was most common.
              *  The delimiter with the longest mode row length wins.
              *  Then, the line number of the header row is the first row with
@@ -7382,7 +7382,7 @@ namespace csv {
     }
 
     /** Guess the delimiter used by a delimiter-separated values file */
-    CSV_INLINE CSVGuessResult guess_format(csv::string_view filename, const std::vector<char>& delims) {
+    CSV_INLINE CSVGuessResult guess_format(csv::string_view filename, const std::vector<unsigned int>& delims) {
         auto head = internals::get_csv_head(filename);
         return internals::_guess_format(head, delims);
     }

@@ -410,10 +410,28 @@ namespace csv {
 #ifdef _MSC_VER
 #pragma region CSVField::get Specializations
 #endif
-    /** Retrieve this field's original string */
+    /** Retrieve this field's string without escaping quto "" => "
+    * to get original string in CSV use this->get<csv::string_view>()
+    */
     template<>
     inline std::string CSVField::get<std::string>() {
-        return std::string(this->sv);
+        std::string s;
+
+        // TODO: assume the quote is always "
+        // how about user specify a different quote 
+        // with format.quote('*')??
+        for (size_t i = 0; i < this->sv.size(); i++)
+        {
+            if (sv[i] != '"') {
+                s.append(sv, i, 1);
+            }
+            else if (i + 1 < this->sv.size() && this->sv[i + 1] == '"')
+            {
+                s.append(sv, i, 1);
+                continue;
+            }
+        }
+        return s;
     }
 
     /** Retrieve a view over this field's string

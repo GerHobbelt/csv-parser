@@ -431,7 +431,7 @@ namespace csv {
                 continue;
             }
         }
-        return s;
+        return std::move(s);
     }
 
     /** Retrieve a view over this field's string

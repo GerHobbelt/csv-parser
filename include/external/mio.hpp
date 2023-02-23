@@ -108,9 +108,9 @@ inline size_t make_offset_page_aligned(size_t offset) noexcept
 #include <cstdint>
 
 #ifdef _WIN32
-# ifndef WIN32_LEAN_AND_MEAN
-#  define WIN32_LEAN_AND_MEAN
-# endif // WIN32_LEAN_AND_MEAN
+//# ifndef WIN32_LEAN_AND_MEAN
+//#  define WIN32_LEAN_AND_MEAN
+//# endif // WIN32_LEAN_AND_MEAN
 # include <windows.h>
 #else // ifdef _WIN32
 # define INVALID_HANDLE_VALUE -1

@@ -13,7 +13,7 @@ namespace csv {
     struct CSVFileInfo {
         std::string filename;               /**< Filename */
         std::vector<std::string> col_names; /**< CSV column names */
-        char delim;                         /**< Delimiting character */
+        unsigned int delim;                         /**< Delimiting character */
         size_t n_rows;                      /**< Number of rows in a file */
         size_t n_cols;                      /**< Number of columns in a CSV */
     };

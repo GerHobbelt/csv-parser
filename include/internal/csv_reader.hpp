@@ -36,7 +36,7 @@ namespace csv {
 
         CSV_INLINE GuessScore calculate_score(csv::string_view head, CSVFormat format);
 
-        CSVGuessResult _guess_format(csv::string_view head, const std::vector<char>& delims = { ',', '|', '\t', ';', '^', '~' });
+        CSVGuessResult _guess_format(csv::string_view head, const std::vector<unsigned int>& delims = { ',', '|', '\t', ';', '^', '~' });
     }
 
     std::vector<std::string> get_col_names(
@@ -45,7 +45,7 @@ namespace csv {
 
     /** Guess the delimiter used by a delimiter-separated values file */
     CSVGuessResult guess_format(csv::string_view filename,
-        const std::vector<char>& delims = { ',', '|', '\t', ';', '^', '~' });
+        const std::vector<unsigned int>& delims = { ',', '|', '\t', ';', '^', '~' });
 
     /** @class CSVReader
      *  @brief Main class for parsing CSVs from files and in-memory sources

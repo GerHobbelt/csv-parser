@@ -22,61 +22,36 @@
 #include "csv_row.hpp"
 
 namespace csv {
+
+    #define IM_UNICODE_CODEPOINT_INVALID 0xFFFD     // Invalid Unicode code point (standard value).
+    #ifdef IMGUI_USE_WCHAR32
+    #define IM_UNICODE_CODEPOINT_MAX     0x10FFFF   // Maximum Unicode code point supported by this build.
+    #else
+    #define IM_UNICODE_CODEPOINT_MAX     0xFFFF     // Maximum Unicode code point supported by this build.
+    #endif
+
     namespace internals {
-        /** Create a vector v where each index i corresponds to the
+         /** Create a vector v where each index i corresponds to the
          *  ASCII number for a character and, v[i + 128] labels it according to
          *  the CSVReader::ParseFlags enum
          */
-        HEDLEY_CONST CONSTEXPR_17 ParseFlagMap make_parse_flags(char delimiter) {
-            std::array<ParseFlags, 256> ret = {};
-            for (int i = -128; i < 128; i++) {
-                const int arr_idx = i + 128;
-                char ch = char(i);
+        inline ParseFlagMap make_parse_flags(unsigned int delimiter, unsigned int quote_char=0) {
+            std::map<unsigned int, ParseFlags> flags;
+            flags[delimiter] = ParseFlags::DELIMITER;
+            flags['\r'] = ParseFlags::NEWLINE;
+            flags['\n'] = ParseFlags::NEWLINE;
+            if (quote_char)
+                flags[quote_char] = ParseFlags::QUOTE;
+            // others are ParseFlags::NOT_SPECIAL
+            return flags;               
+        }
 
-                if (ch == delimiter)
-                    ret[arr_idx] = ParseFlags::DELIMITER;
-                else if (ch == '\r' || ch == '\n')
-                    ret[arr_idx] = ParseFlags::NEWLINE;
-                else
-                    ret[arr_idx] = ParseFlags::NOT_SPECIAL;
+        inline WhitespaceMap make_ws_flags(const std::vector<unsigned int>& flags) {
+            std::set<unsigned int> ws_set;
+            for (auto& i : flags) {
+                ws_set.insert(i);
             }
-
-            return ret;
-        }
-
-        /** Create a vector v where each index i corresponds to the
-         *  ASCII number for a character and, v[i + 128] labels it according to
-         *  the CSVReader::ParseFlags enum
-         */
-        HEDLEY_CONST CONSTEXPR_17 ParseFlagMap make_parse_flags(char delimiter, char quote_char) {
-            std::array<ParseFlags, 256> ret = make_parse_flags(delimiter);
-            ret[(size_t)quote_char + 128] = ParseFlags::QUOTE;
-            return ret;
-        }
-
-        /** Create a vector v where each index i corresponds to the
-         *  ASCII number for a character c and, v[i + 128] is true if
-         *  c is a whitespace character
-         */
-        HEDLEY_CONST CONSTEXPR_17 WhitespaceMap make_ws_flags(const char* ws_chars, size_t n_chars) {
-            std::array<bool, 256> ret = {};
-            for (int i = -128; i < 128; i++) {
-                const int arr_idx = i + 128;
-                char ch = char(i);
-                ret[arr_idx] = false;
-
-                for (size_t j = 0; j < n_chars; j++) {
-                    if (ws_chars[j] == ch) {
-                        ret[arr_idx] = true;
-                    }
-                }
-            }
-
-            return ret;
-        }
-
-        inline WhitespaceMap make_ws_flags(const std::vector<char>& flags) {
-            return make_ws_flags(flags.data(), flags.size());
+            return ws_set;
         }
 
         CSV_INLINE size_t get_file_size(csv::string_view filename);
@@ -210,11 +185,18 @@ namespace csv {
             /** Indicate the last block of data has been parsed */
             void end_feed();
 
-            CONSTEXPR_17 ParseFlags parse_flag(const char ch) const noexcept {
-                return _parse_flags.data()[ch + 128];
+            ParseFlags parse_flag(const unsigned int ch) const noexcept {
+                auto it = _parse_flags.find(ch);
+                if (it != _parse_flags.end()) {
+                    return it->second;
+                }
+                else
+                {
+                    return ParseFlags::NOT_SPECIAL;
+                }
             }
 
-            CONSTEXPR_17 ParseFlags compound_parse_flag(const char ch) const noexcept {
+            ParseFlags compound_parse_flag(const unsigned int ch) const noexcept {
                 return quote_escape_flag(parse_flag(ch), this->quote_escape);
             }
 
@@ -233,7 +215,7 @@ namespace csv {
             int field_start = UNINITIALIZED_FIELD;
             size_t field_length = 0;
 
-            /** An array where the (i + 128)th slot gives the ParseFlags for ASCII character i */
+            /** map for pase flags */
             ParseFlagMap _parse_flags;
             ///@}
 
@@ -253,10 +235,14 @@ namespace csv {
              *  @returns How many character were read that are part of complete rows
              */
             size_t parse();
-
+            
             /** Create a new RawCSVDataPtr for a new chunk of data */
             void reset_data_ptr();
         private:
+            // Find next char unit (glyph) return the lenth of the glyph
+            int next_glyph(unsigned int* out_char, size_t pos);
+            int TextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
+
             /** An array where the (i + 128)th slot determines whether ASCII character i should
              *  be trimmed
              */
@@ -274,8 +260,12 @@ namespace csv {
             /** Where complete rows should be pushed to */
             RowCollection* _records = nullptr;
 
-            CONSTEXPR_17 bool ws_flag(const char ch) const noexcept {
-                return _ws_flags.data()[ch + 128];
+            bool ws_flag(const unsigned int ch) const noexcept {
+                auto it = _ws_flags.find(ch);
+                if (it != _ws_flags.end())
+                    return true;
+                else
+                    return false;
             }
 
             size_t& current_row_start() {

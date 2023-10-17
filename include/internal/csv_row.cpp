@@ -156,11 +156,11 @@ namespace csv {
                 return false;
             }
 
-            value += digit * pow(16, base16_exponent);
+            value += digit * (int)pow(16, base16_exponent);
             base16_exponent--;
         }
 
-        parsedValue = value;
+        parsedValue = (int)value; 
         return true;
     }
 

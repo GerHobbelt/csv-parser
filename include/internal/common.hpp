@@ -5,6 +5,8 @@
 #pragma once
 #include <algorithm>
 #include <array>
+#include <set>
+#include <map>
 #include <cmath>
 #include <cstdlib>
 #include <deque>
@@ -196,11 +198,11 @@ namespace csv {
         STATIC_ASSERT(quote_escape_flag(ParseFlags::DELIMITER, true) == ParseFlags::NOT_SPECIAL);
         STATIC_ASSERT(quote_escape_flag(ParseFlags::NEWLINE, true) == ParseFlags::NOT_SPECIAL);
 
-        /** An array which maps ASCII chars to a parsing flag */
-        using ParseFlagMap = std::array<ParseFlags, 256>;
+        /** An set which contains parsing flags */
+        using ParseFlagMap = std::map<unsigned int, ParseFlags>;
 
-        /** An array which maps ASCII chars to a flag indicating if it is whitespace */
-        using WhitespaceMap = std::array<bool, 256>;
+        /** An set which contains whitespaces*/
+        using WhitespaceMap = std::set<unsigned int>;
     }
 
     /** Integer indicating a requested column wasn't found. */

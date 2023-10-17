@@ -90,7 +90,7 @@ namespace csv {
         }
 
         /** Guess the delimiter used by a delimiter-separated values file */
-        CSV_INLINE CSVGuessResult _guess_format(csv::string_view head, const std::vector<char>& delims) {
+        CSV_INLINE CSVGuessResult _guess_format(csv::string_view head, const std::vector<unsigned int>& delims) {
             /** For each delimiter, find out which row length was most common.
              *  The delimiter with the longest mode row length wins.
              *  Then, the line number of the header row is the first row with
@@ -100,9 +100,9 @@ namespace csv {
             CSVFormat format;
             size_t max_score = 0,
                 header = 0;
-            char current_delim = delims[0];
+            unsigned int current_delim = delims[0];
 
-            for (char cand_delim : delims) {
+            for (unsigned int cand_delim : delims) {
                 auto result = calculate_score(head, format.delimiter(cand_delim));
 
                 if ((size_t)result.score > max_score) {
@@ -135,7 +135,7 @@ namespace csv {
     }
 
     /** Guess the delimiter used by a delimiter-separated values file */
-    CSV_INLINE CSVGuessResult guess_format(csv::string_view filename, const std::vector<char>& delims) {
+    CSV_INLINE CSVGuessResult guess_format(csv::string_view filename, const std::vector<unsigned int>& delims) {
         auto head = internals::get_csv_head(filename);
         return internals::_guess_format(head, delims);
     }
